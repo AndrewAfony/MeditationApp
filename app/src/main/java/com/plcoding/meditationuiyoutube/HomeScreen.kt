@@ -16,15 +16,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.plcoding.meditationuiyoutube.ui.theme.*
 
+@ExperimentalFoundationApi
 @Composable
 fun HomeScreen() {
     Box(modifier = Modifier
@@ -35,7 +39,47 @@ fun HomeScreen() {
             GreetingSection()
             ChipSection(chips = listOf("Sweet sleep", "Insomnia", "Depression"))
             CurrentMeditation()
+            FeatureSection(features = listOf(
+                Feature(
+                    title = "Sleep meditation",
+                    R.drawable.ic_headphone,
+                    BlueViolet1,
+                    BlueViolet2,
+                    BlueViolet3
+                ),
+                Feature(
+                    title = "Tips for sleeping",
+                    R.drawable.ic_videocam,
+                    LightGreen1,
+                    LightGreen2,
+                    LightGreen3
+                ),
+                Feature(
+                    title = "Night island",
+                    R.drawable.ic_headphone,
+                    OrangeYellow1,
+                    OrangeYellow2,
+                    OrangeYellow3
+                ),
+                Feature(
+                    title = "Calming sounds",
+                    R.drawable.ic_headphone,
+                    Beige1,
+                    Beige2,
+                    Beige3
+                )
+            ))
         }
+        BottomNavigation(
+            items = listOf(
+            BottomMenuItem("Home", R.drawable.ic_home),
+            BottomMenuItem("Meditate", R.drawable.ic_bubble),
+            BottomMenuItem("Sleep", R.drawable.ic_moon),
+            BottomMenuItem("Music", R.drawable.ic_music),
+            BottomMenuItem("Profile", R.drawable.ic_profile)
+            ),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
@@ -167,7 +211,7 @@ fun FeatureSection(
                 .fillMaxHeight()
         ) {
             items(features.size) {
-
+                FeatureItem(feature = features[it])
             }
         }
     }
@@ -222,7 +266,7 @@ fun FeatureItem(
             lineTo(-100f, height.toFloat() + 100f)
             close()
         }
-        
+
         Canvas(
             modifier = Modifier.fillMaxSize()
         ){
@@ -236,10 +280,116 @@ fun FeatureItem(
             )
         }
 
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = feature.title,
+                style = MaterialTheme.typography.h2,
+                lineHeight = 26.sp,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+            )
+            Icon(
+                painter = painterResource(id = feature.iconId),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+            )
+            Text(
+                text = "Start",
+                color = TextWhite,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+                        // TODO (Handle the click)
+                    }
+                    .align(Alignment.BottomEnd)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(ButtonBlue)
+                    .padding(vertical = 6.dp, horizontal = 16.dp)
+            )
+        }
+
 
     }
 }
 
+@Composable
+fun BottomNavigation(
+    items: List<BottomMenuItem>,
+    modifier: Modifier = Modifier,
+    activeHighLightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    initialSelectedItemIndex: Int = 0
+) {
+    var selectedItemIndex by remember { mutableStateOf(initialSelectedItemIndex) }
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(16.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            BottomMenuItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighLightColor = activeHighLightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ) {
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomMenuItem(
+    item: BottomMenuItem,
+    isSelected: Boolean = false,
+    activeHighLightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .clickable { onItemClick() }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) activeHighLightColor else Color.Transparent)
+                .padding(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconId),
+                contentDescription = null,
+                tint = if(isSelected) activeTextColor else inactiveTextColor,
+                modifier = Modifier
+                    .size(20.dp)
+            )
+        }
+        Text(
+            text = item.title,
+            color = if(isSelected) activeTextColor else inactiveTextColor
+        )
+    }
+}
+
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun Prev() {
